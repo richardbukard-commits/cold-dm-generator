@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ColdReach AI</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+        }
+        input, select, textarea, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        button {
+            background: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .output {
+            background: #f4f4f4;
+            padding: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>ColdReach AI – Cold Outreach Generator</h2>
+
+<input id="service" placeholder="Your Service (e.g. Web Design)">
+<input id="client" placeholder="Target Client (e.g. Gym Owners)">
+<input id="benefit" placeholder="Result You Provide (e.g. 30% more leads)">
+<select id="platform">
+    <option>Email</option>
+    <option>Instagram</option>
+    <option>LinkedIn</option>
+</select>
+
+<button onclick="generate()">Generate Outreach</button>
+
+<div class="output" id="result"></div>
+
+<script>
+function generate() {
+    let service = document.getElementById("service").value;
+    let client = document.getElementById("client").value;
+    let benefit = document.getElementById("benefit").value;
+    let platform = document.getElementById("platform").value;
+
+    let message = `
+Message 1:
+Hi, I work with ${client} helping them with ${service} to achieve ${benefit}. 
+I noticed your profile and thought there might be an opportunity to collaborate.
+
+Message 2:
+Quick question — are you currently looking to improve your results with ${service}? 
+I’d love to share a quick idea that could help you reach ${benefit}.
+
+Follow-Up:
+Just wanted to follow up in case this got buried. 
+Let me know if you'd like to hear the idea!
+
+`;
+
+    document.getElementById("result").innerText = message;
+}
+</script>
+
+</body>
+</html>
