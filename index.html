@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ColdReach AI – Cold Outreach Generator</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Background Slogan */
+  .bg-slogan {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-20deg);
+    font-size: 90px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.04);
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 30px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    z-index: 1;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 26px;
+    margin-bottom: 5px;
+    background: linear-gradient(90deg, #00f2fe, #4facfe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  p.tagline {
+    text-align: center;
+    font-size: 14px;
+    color: #ccc;
+    margin-bottom: 20px;
+  }
+
+  input, select, button {
+    width: 100%;
+    padding: 14px;
+    margin: 8px 0;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+  }
+  input, select {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  input::placeholder { color: #bbb; }
+
+  button {
+    background: linear-gradient(90deg, #00f2fe, #4facfe);
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  button:hover { transform: scale(1.02); }
+
+  .output {
+    background: rgba(0,0,0,0.4);
+    padding: 18px;
+    border-radius: 10px;
+    margin-top: 20px;
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 50px;
+  }
+
+  .copy-btn {
+    background: #fff;
+    color: #000;
+    margin-top: 10px;
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  .loader {
+    display: none;
+    text-align: center;
+    margin-top: 10px;
+    color: #4facfe;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-slogan">REPLIES. CLIENTS. RESULTS.</div>
+
+<div class="container">
+  <h1>ColdReach AI</h1>
+  <p class="tagline">Cold messages that actually get replies.</p>
+
+  <input id="service" placeholder="Your Service (e.g. Web Design)">
+  <input id="client" placeholder="Target Client (e.g. Gym Owners)">
+  <input id="benefit" placeholder="Result You Provide (e.g. 30% more leads)">
+  
+  <select id="platform">
+    <option>Instagram</option>
+    <option>LinkedIn</option>
+    <option>Email</option>
+  </select>
+
+  <select id="tone">
+    <option>Friendly</option>
+    <option>Professional</option>
+    <option>Bold & Direct</option>
+    <option>Casual</option>
+  </select>
+
+  <button onclick="generate()">⚡ Generate Outreach</button>
+
+  <div class="loader" id="loader">Generating your messages...</div>
+
+  <div class="output" id="result"></div>
+  <button class="copy-btn" onclick="copyText()">📋 Copy Messages</button>
+</div>
+
+<script>
+const API_KEY = "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"; // 🔑 paste your key here
+
+async function generate() {
+  const service = document.getElementById("service").value;
+  const client = document.getElementById("client").value;
+  const benefit = document.getElementById("benefit").value;
+  const platform = document.getElementById("platform").value;
+  const tone = document.getElementById("tone").value;
+  const result = document.getElementById("result");
+  const loader = document.getElementById("loader");
+
+  if (!service || !client || !benefit) {
+    result.innerText = "⚠️ Please fill in all fields.";
+    return;
+  }
+
+  result.innerText = "";
+  loader.style.display = "block";
+
+  const prompt = `
+You are an expert cold outreach copywriter.
+Write 3 high-converting cold ${platform} messages in a ${tone} tone.
+Then write 1 follow-up message.
+If platform is Email, also include a subject line.
+
+Context:
+- Service offered: ${service}
+- Target client: ${client}
+- Result delivered: ${benefit}
+
+Rules:
+- Keep messages short (3-5 sentences)
+- Sound human, not salesy
+- Use curiosity and personalization
+- End with a soft CTA
+- Format clearly with labels (Message 1, Message 2, etc.)
+`;
+
+  try {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + API_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.8
+      })
+    });
+
+    const data = await response.json();
+    loader.style.display = "none";
+
+    if (data.choices && data.choices[0]) {
+      result.innerText = data.choices[0].message.content;
+    } else {
+      result.innerText = "❌ Error generating messages. Check your API key.";
+    }
+  } catch (e) {
+    loader.style.display = "none";
+    result.innerText = "❌ Network error. Try again.";
+  }
+}
+
+function copyText() {
+  const text = document.getElementById("result").innerText;
+  if (!text) return;
+  navigator.clipboard.writeText(text);
+  alert("✅ Messages copied!");
+}
+</script>
+
+</body>
+</html>
